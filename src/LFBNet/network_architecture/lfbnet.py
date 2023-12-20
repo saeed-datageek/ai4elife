@@ -11,6 +11,7 @@ from numpy import ndarray
 from copy import deepcopy
 
 import logging
+
 logging.getLogger('tensorflow').disabled = True
 import tensorflow as tf
 from keras.models import Model
@@ -35,13 +36,16 @@ from src.LFBNet.network_architecture.get_conv_blocks import StackedConvLayerABlo
 from src.LFBNet.losses.losses import LossMetric
 
 
-# function to set/configure default parameters for lfbnet.
-def get_default_config(dimension: int = 2, dropout_ratio: float = 0.5, non_linear_activation: str = 'elu',
-        batch_norm: bool = True, strides: int = 1, pooling: bool = True, pool_size:int =2, default_skips: bool = True,
-        kernel_size: int = 3, kernel_initializer: str = 'he_normal', use_bias: bool = False, padding: str = 'same',
-        num_conv_per_block: int = 2, skip_encoder=None, use_residual: bool = True,
-        apply_dropout_subblock: bool = False) -> dict:
+## change default_config
 
+# function to set/configure default parameters for lfbnet.
+def get_default_config(dimension: int = 3, dropout_ratio: float = 0.5, non_linear_activation: str = 'elu',
+                       batch_norm: bool = True, strides: int = 1, pooling: bool = True, pool_size: int = 2,
+                       default_skips: bool = True,
+                       kernel_size: int = 3, kernel_initializer: str = 'he_normal', use_bias: bool = False,
+                       padding: str = 'same',
+                       num_conv_per_block: int = 2, skip_encoder=None, use_residual: bool = True,
+                       apply_dropout_subblock: bool = False) -> dict:
     """ Setup/configure default network configurations
 
     Args:
@@ -103,9 +107,9 @@ class LfbNet:
     """
 
     def __init__(self, input_image_shape: ndarray = None, num_output_class: int = 1, base_num_features: int = 32,
-            conv_config: dict = None, conv_kernel_sizes:int=3, default_skips: bool = True, num_layers: int = 4,
-            use_skip: bool = True, num_classes: int = 1, decoder_input_shape=None, skipped_input=None,
-            num_conv_per_block: int = 2):
+                 conv_config: dict = None, conv_kernel_sizes: int = 3, default_skips: bool = True, num_layers: int = 4,
+                 use_skip: bool = True, num_classes: int = 1, decoder_input_shape=None, skipped_input=None,
+                 num_conv_per_block: int = 2):
         """ set parameters to configure LFBNet
         Args:
             input_image_shape: dimension of the input images to the network, e.g,. [128, 256, 1]
@@ -128,7 +132,7 @@ class LfbNet:
         """
 
         if input_image_shape is None:
-            input_image_shape = [128, 256, 1]
+            input_image_shape = [128, 256, 32]
 
         self.img_shape = input_image_shape
         self.channels_out = num_output_class
@@ -346,7 +350,7 @@ class LfbNet:
             # decrease the number of features per block:  (self.num_decoder_stage-decoder_stage)
             num_output_features = int(self.base_num_features * (2 ** (self.num_layers - (2 + decoder_stage))))
             current_up_conv = UpConvLayer(current_up_conv, num_output_features=num_output_features,
-                                          conv_upsampling="2D").Up_conv_layer()
+                                          conv_upsampling="3D").Up_conv_layer()
             # Need skipp connections:
             if self.conv_config['merging_strategy'] is not None:
                 skipped_ = skip_input[decoder_stage]
@@ -406,7 +410,7 @@ class LfbNet:
 
             # up convolution block
             current_up_conv = UpConvLayer(current_up_conv, num_output_features=num_output_features,
-                                          conv_upsampling="2D").Up_conv_layer()
+                                          conv_upsampling="3D").Up_conv_layer()
 
             # convolution blocks
             current_up_conv = StackedConvLayerABlock(current_up_conv, num_output_features, conv_config=self.conv_config,
@@ -437,5 +441,3 @@ if __name__ == '__main__':
     props = get_default_config()
     model = LfbNet()
     print("network summary \n")
-
-
