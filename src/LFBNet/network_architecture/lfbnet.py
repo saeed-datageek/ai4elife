@@ -132,15 +132,15 @@ class LfbNet:
         """
 
         if input_image_shape is None:
-            input_image_shape = [128, 256, 32]
-
-        self.img_shape = input_image_shape
+            input_image_shape = [128, 256, 1]
+        input_image_shape_with_channel = input_image_shape + [1]
+        self.img_shape = input_image_shape_with_channel
         self.channels_out = num_output_class
         self.base_num_features = base_num_features
 
         latent_dim_input_ratio = 2 ** (num_layers - 1)
         # input_sahpe[-1] is the channel, it will be replaced by base_num_features*latent_dim_input_ratio
-        self.latent_dim = [int(dim / latent_dim_input_ratio) for dim in input_image_shape]
+        self.latent_dim = [int(dim / latent_dim_input_ratio) for dim in input_image_shape_with_channel]
 
         # add the at last the number of features : base_num_features * latent_dim_input_ratio in feature space
         self.latent_dim[-1] = int(base_num_features * latent_dim_input_ratio)
