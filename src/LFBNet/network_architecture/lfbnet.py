@@ -40,9 +40,9 @@ from src.LFBNet.losses.losses import LossMetric
 
 # function to set/configure default parameters for lfbnet.
 def get_default_config(dimension: int = 3, dropout_ratio: float = 0.5, non_linear_activation: str = 'elu',
-                       batch_norm: bool = True, strides: int = 1, pooling: bool = True, pool_size: int = 2,
+                       batch_norm: bool = True, strides: int = 1, pooling: bool = True, pool_size: tuple = (2, 2, 2),
                        default_skips: bool = True,
-                       kernel_size: int = 3, kernel_initializer: str = 'he_normal', use_bias: bool = False,
+                       kernel_size: tuple = (3, 3, 3), kernel_initializer: str = 'he_normal', use_bias: bool = False,
                        padding: str = 'same',
                        num_conv_per_block: int = 2, skip_encoder=None, use_residual: bool = True,
                        apply_dropout_subblock: bool = False) -> dict:
@@ -87,7 +87,7 @@ def get_default_config(dimension: int = 3, dropout_ratio: float = 0.5, non_linea
         config['conv'] = Conv3D
         config["2D_3D"] = '3D'
         if pooling:
-            config['pooling_op'] = MaxPooling3D
+            config['pooling_op'] = MaxPooling3D(pool_size=(2, 2, 2), strides=(2, 2, 2), padding='valid')
 
     else:
         raise Exception("Please use either 2D or 3D CNN, NOT IMPLEMENTED! \n")
